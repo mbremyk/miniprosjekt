@@ -1,0 +1,261 @@
+body {
+    background-color: #212121;
+}
+
+html {
+    background-color: #212121;
+}
+
+/*
+!* General content styling *!
+html, body {
+    min-height: 100%;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, Helvetica, sans-serif;
+    background-color: #35294F;
+    color: #E8E7EB;
+}
+
+!* Header *!
+header {
+    overflow: hidden;
+    background-color: #130B24;
+    font-size: 17px;
+    position: fixed;
+    z-index: 2;
+    width: 100%;
+    top: 0;
+}
+
+.fa-newspaper-o {
+    font-size: 17px;
+}
+
+.topnav a, NavBar Button {
+    float: left;
+    text-align: center;
+    padding: 14px 16px;
+    text-decoration: none;
+    color: #E8E7EB;
+}
+
+.topnav a.active, NavBar Button.active {
+    background-color: #337534;
+}
+
+.topnav a:hover, Navbar Button:hover {
+    background-color: #E8E7EB;
+    color: #07010E;
+}
+
+.logoutbox {
+    float: right;
+    height: 100%;
+    background-color: #362D49;
+    border-radius: 10px;
+    margin-right: 5px;
+}
+
+.logoutbox a:hover {
+    border-radius: 10px;
+}
+
+.searchbar {
+    float: right;
+}
+
+.searchbar input[type=text] {
+    padding: 6px;
+    border: none;
+    margin-top: 8px;
+    font-size: 17px;
+    border-radius: 10px 0 0 10px;
+    background-color: #362D49;
+}
+
+.searchbar input[type=text]::placeholder {
+    color: rgba(232, 231, 235, 0.8);
+}
+
+.searchbar input[type=text]:focus {
+    background-color: #E8E7EB;
+    outline-style: none;
+}
+
+.searchbar input[type=text]:focus::placeholder {
+    color: #E8E7EB;
+    color: rgba(7, 1, 14, 0.6);
+}
+
+.searchbar button {
+    color: #E8E7EB;
+    float: right;
+    padding: 6px 10px;
+    margin-top: 8px;
+    margin-right: 16px;
+    background: #362D49;
+    font-size: 17px;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 10px 10px 0;
+}
+
+
+!* Main content *!
+.main-content {
+    top: 48px;
+    width: 100%;
+    height: 100%;
+    display: grid;
+    grid-template-columns: auto 60% auto;
+    grid-gap: 5px;
+    position: relative;
+    margin: 5px 0 20px 0;
+}
+
+.content-frame {
+    display: grid;
+    grid-column-start: 2;
+    grid-column-end: 2;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto auto auto auto auto 1fr;
+    grid-gap: 5px 0;
+    background-color: rgba(130, 130, 130, 0.2);
+    padding: 15px;
+}
+
+.content-frame img {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 1;
+    grid-row-end: 1;
+    max-width: 100%;
+}
+
+.title {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 2;
+    grid-row-end: 2;
+    font-size: 36px;
+}
+
+.lead {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 3;
+    grid-row-end: 3;
+}
+
+.author-date-time {
+    grid-column-start: 1;
+    grid-column-end: 1;
+    grid-row-start: 4;
+    grid-row-end: 4;
+    margin: 10px 0;
+    display: flex;
+    flex-direction: column;
+}
+
+.text-body {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 5;
+    grid-row-end: 5;
+    margin-bottom: 10px;
+}
+
+.text-body a, .lead a {
+    text-decoration: none;
+    color: #3B873C;
+    background-image: radial-gradient(#3B873C, #3B873C);
+    background-position: 0px 15px;
+    background-repeat: repeat-x;
+    background-size: 100% 2px;
+}
+
+.text-body a:hover, .lead a:hover {
+    color: #58B65A;
+    background-image: radial-gradient(#58B65A, #58B65A);
+}
+
+.text-body img {
+    max-width: 70%;
+}
+
+.tags {
+    margin-top: 10px;
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 6;
+    grid-row-end: 6;
+}
+
+.tags a {
+    background-color: #337534;
+    color: #E8E7EB;
+    padding: 5px;
+    text-decoration: none;
+    margin-right: 10px;
+}
+
+.tags a:hover {
+    background-color: #E8E7EB;
+    color: #07010E;
+}
+
+!* Footer *!
+
+footer {
+    top: 48px;
+    background-color: #130B24;
+    height: 100px;
+    font-size: 10px;
+}
+
+.contact-info {
+    position: absolute;
+    bottom: 15px;
+    left: 35px;
+}
+
+.contact-info p {
+    margin: 5px 0;
+}
+
+.copyright {
+    position: absolute;
+    bottom: 15px;
+    right: 35px;
+}
+
+AppBar {
+    min-width: 100%;
+    background-color: #130B24;
+    grid-row-start: 0;
+    grid-row-end: 0;
+    grid-column-start: 0;
+    grid-column-end: 6;
+}
+
+.topnav {
+    min-width: 100%;
+    display: grid;
+    grid-template-rows: 1fr;
+    grid-template: 'navbar navbar navbar navbar navbar navbar other';
+    background-color: #3f51b5;
+}
+
+.commentList {
+    grid-column-start: 1;
+    grid-column-end: 2;
+    grid-row-start: 7;
+    grid-row-end: 7;
+}
+
+a {
+    color: red;
+}*/

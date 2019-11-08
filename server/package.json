@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "server.js",
+  "scripts": {
+    "start": "babel-node server.js"
+  },
+  "author": "Brevik Magnus",
+  "license": "ISC",
+  "devDependencies": {
+    "cors": "^2.8.5",
+    "sequelize": "^5.21.2"
+  },
+  "dependencies": {
+    "@babel/core": "^7.6.4",
+    "@babel/node": "^7.6.3",
+    "@babel/preset-flow": "^7.0.0",
+    "@babel/register": "latest",
+    "body-parser": "latest",
+    "esm": "^3.2.25",
+    "express": "latest",
+    "mysql": "latest",
+    "mysql2": "^2.0.0",
+    "react-scripts": "^3.2.0"
+  },
+  "proxy": "http://localhost:4000"
+}
