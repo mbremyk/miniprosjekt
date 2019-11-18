@@ -4,12 +4,14 @@
   "description": "",
   "main": "server.js",
   "scripts": {
-    "start": "babel-node server.js"
+    "start": "babel-node server.js",
+    "flow": "flow"
   },
   "author": "Brevik Magnus",
   "license": "ISC",
   "devDependencies": {
     "cors": "^2.8.5",
+    "flow-bin": "^0.111.3",
     "sequelize": "^5.21.2"
   },
   "dependencies": {
@@ -20,6 +22,7 @@
     "body-parser": "latest",
     "esm": "^3.2.25",
     "express": "latest",
+    "flow": "^0.2.3",
     "mysql": "latest",
     "mysql2": "^2.0.0",
     "react-scripts": "^3.2.0"

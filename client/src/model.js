@@ -1,3 +1,5 @@
+// @flow
+
 import axios from "axios";
 import React from "react";
 
@@ -57,11 +59,17 @@ export class ArticleStore
         });
     }
 
-    postArticle(article)
+    postArticle(article: Article)
     {
         return axios.post(_localhost + `/news`, article).then(response => {
             return response.data;
         })
+    }
+
+    updateArticle(props)
+    {
+        console.log(props);
+        //return axios.put(_localhost + `/news/${props.}`)
     }
 }
 

@@ -1,3 +1,5 @@
+// @flow
+
 const model = require('./model.js');
 const express = require("express");
 const mysql = require("mysql");
@@ -22,7 +24,7 @@ app.use(cors());
 
 app.get("/news", (req, res) => {
     console.log("GET-request received from client");
-    return model.ArticleModel.findAll().then(article => res.send(article));
+    return model.ArticleModel.findAll({order: [['createdAt', 'DESC']]}).then(article => res.send(article));
 });
 
 app.post("/news", (req, res) => {
@@ -41,51 +43,26 @@ app.get("/category/:categoryId", (req, res) => {
     return model.ArticleModel.findAll({
         where: {
             categoryId: req.params.categoryId
-        }
+        },
+        order: [['createdAt', 'DESC']]
     }).then(article => res.send(article));
 });
 
-/*app.get("/news/category/:categoryId", (req, res) => {
-    console.log("GET-request received from client");
-    pool.getConnection((err, connection) => {
-        if (err) {
-            console.log("Error during connection");
-            res.json({ "error": "error during connection" });
-        } else {
-            console.log("Database connection aquired");
-            var query = "SELECT * FROM news";
-            if(req.params.category != -1 || req.params.priority != -1)
-            {
-                query += " WHERE";
-                query += req.params.category != -1 ? (" categoryId = ?" + (req.params.priority != -1 ? (" AND priority = ?") : (""))) : (req.params.priority != -1 ? (" priority = ?") : (""));
-                console.log(query);
-            }
-            connection.query(
-                query,
-                req.params.category != -1 ? ((req.params.priority != -1 ? [req.params.category, req.params.priority] : [req.params.category])) : (req.params.priority != -1 ? [req.params.priority] : []),
-                (err, rows) => {
-                    connection.release();
-                    if(err) {
-                        console.log(err);
-                        res.json({"error":"error during query"})
-                    } else {
-                        console.log(rows);
-                        res.json(rows);
-                    }
-                }
-            );
-        }
-    });
-});*/
-
 app.get("/categories", (req, res) => {
     console.log("GET-request received from client");
-    return model.CategoryModel.findAll().then(category => res.send(category));
+    return model.CategoryModel.findAll({
+        order: [['createdAt', 'DESC']]
+    }).then(category => res.send(category));
 });
 
 app.get("/news/:id", (req, res) => {
     console.log("GET-request received from client");
-    return model.ArticleModel.findAll({where: {id: req.params.id}})
+    return model.ArticleModel.findAll({
+        where: {
+            id: req.params.id
+        },
+        order: [['createdAt', 'DESC']]
+    })
                 .then(article => res.send(article))
                 .catch(error => console.error(error));
 });
@@ -98,11 +75,22 @@ app.put("/news/:id", (req, res) => {
         imageUrl: req.body.imageUrl,
         categoryId: req.body.categoryId,
         priority: req.body.priority
-    },{
+    }, {
         where: {
             id: req.body.id
         }
     })
+                .then(res.send(204))
+                .catch(res.send(404))
+                .catch(error => console.error(error));
+});
+
+app.delete("/news/:id", (req, res) => {
+    console.log("DELETE-request received from clien");
+    return model.ArticleModel.destroy({where: {id: req.params.id}})
+                .then(res.send(204))
+                .catch(res.send(404))
+                .catch(error => console.error(error));
 });
 
 var server = app.listen(4000);

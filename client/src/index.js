@@ -1,28 +1,34 @@
+// @flow
+
 import React from 'react';
 import {Component, sharedComponentData} from 'react-simplified';
 import ReactDOM from 'react-dom';
 import {
-    Button,
-    Typography,
-    Box,
     AppBar,
-    Tabs,
-    Tab,
-    TextField,
-    MenuItem,
-    Toolbar,
-    IconButton,
-    Menu,
+    Box,
+    Button,
     Card,
     CardActionArea,
-    CardContent,
     CardActions,
+    CardContent,
     CardMedia,
-    Grid
+    Dialog,
+    DialogActions,
+    DialogContent,
+    DialogTitle,
+    Grid,
+    IconButton,
+    Menu,
+    MenuItem,
+    Tab,
+    Tabs,
+    TextField,
+    Toolbar,
+    Typography
 } from '@material-ui/core';
-import {BrowserRouter, Route, NavLink, Switch} from 'react-router-dom';
+import {BrowserRouter, NavLink, Route, Switch} from 'react-router-dom';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import {ArticleStore, CategoryStore, User, Comment} from "./model.js";
+import {ArticleStore, CategoryStore, Comment, User} from "./model.js";
 import AddIcon from "@material-ui/icons/Add";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {useStyles} from "./styles.js";
@@ -110,7 +116,7 @@ function TabList(props)
             props.setValue(newValue);
             articleStore.setArticles(response);
             setIsLoading(false);
-        }).catch(error => console.error(error))
+        }).catch(error => console.error(error));
         setCategoryTab(newValue);
         setAuthorized(true);
     };
@@ -120,7 +126,7 @@ function TabList(props)
             categoryStore.setCategories(response);
             setIsLoading(false);
         }).catch(error => console.error(error))
-    }, [categoryTab]);
+    });
 
     return (
         <Tabs value={categoryTab} onChange={handleChange} aria-label="top navbar">
@@ -164,7 +170,7 @@ function NavBar(props)
     return (
         <AppBar position="static">
             <Toolbar>
-                <Button href="/" className={classes.button}>
+                <Button href="/" className={classes.button} component={NavLink} to="/" onClick={p.setValue(1 / 0)}>
                     <i className="fa fa-newspaper-o">StartSide</i>
                 </Button>
                 <TabList setValue={p.setValue}/>
@@ -305,7 +311,7 @@ function CategoryView(props)
             articleStore.setArticles(response);
             setIsLoading(false);
         }).catch(error => console.error(error))
-    }, [isLoading]);
+    }, [isLoading, props]);
 
     return (
         <div aria-label="main content" className={classes.root}>
@@ -314,7 +320,7 @@ function CategoryView(props)
                     varian="h5">Loading...</Typography></CardContent></Card>}
                 {articleStore.articles.map((article) => {
                     return (
-                        <Grid item xs={12} sm={5} md={4} lg={3} xl={2}>
+                        <Grid item xs={12} sm={5} md={4} lg={3} xl={2} key={article.id}>
                             <ArticleCard props={article} key={article.id} id={`article-${article.id}`}/>
                         </Grid>
                     );
@@ -332,6 +338,7 @@ function ArticleView(props)
     React.useEffect(() => {
         articleStore.getArticlesById(props.match.params.id).then(response => {
             articleStore.setArticles(response);
+            props.setValue(response[0]);
             setIsLoading(false);
         }).catch(error => console.error(error));
     }, [isLoading]);
@@ -349,6 +356,8 @@ function ArticleView(props)
                         <a href={`/user/${article.writerId}`}>{article.writerId}</a>
                         <div>{article.createdAt} {console.log(article.createdAt)}</div>
                         <div>{article.content}</div>
+                        {authorized &&
+                        <NavLink to={`/edit/${article.id}`} className={classes.navlink}><Button>Edit</Button></NavLink>}
                     </div>
                 );
             })}
@@ -451,10 +460,184 @@ function NewArticleView()
     )
 }
 
+function EditArticleView(props)
+{
+    const classes = useStyles();
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [caption, setCaption] = React.useState(props.value.caption);
+    const [imgUrl, setImgUrl] = React.useState(props.value.imageUrl);
+    const [text, setText] = React.useState(props.value.content);
+    const [open, setOpen] = React.useState(false);
+
+    React.useEffect(() => {
+        articleStore.getArticlesById(props.value.id)
+                    .then(response => {
+                        articleStore.setArticles(response);
+                        setIsLoading(false);
+                        setCaption(response.caption);
+                        setImgUrl(response.imageUrl);
+                        setText(response.content);
+                        console.log(caption + " " + imgUrl + " " + text);
+                    })
+                    .catch(error => console.error(error));
+    }, []);
+
+    const handleSubmit = event => {
+        event.preventDefault();
+        if (!caption) setCaption(articleStore.articles[0].caption);
+        if (!imgUrl) setImgUrl(articleStore.articles[0].imageUrl);
+        if (!text) setText(articleStore.articles[0].content);
+        articleStore.updateArticle({
+            caption: caption,
+            imageUrl: imgUrl,
+            content: text,
+            categoryId: 0,
+            priority: 0
+        });
+    };
+
+    const handleClose = del => {
+        if (del)
+        {
+            ArticleStore.deleteArticle(props.value.id);
+            alert("Article deleted")
+        }
+    };
+
+    const handleClick = () => {
+        setOpen(true);
+    };
+
+    return (
+        <div>
+            {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
+                varian="h5">Loading...</Typography></CardContent></Card>}
+            {!isLoading && articleStore.articles.map(article => {
+                if (!caption) setCaption(articleStore.articles[0].caption);
+                if (!imgUrl) setImgUrl(articleStore.articles[0].imageUrl);
+                if (!text) setText(articleStore.articles[0].content);
+                return (
+                    <form onSubmit={handleSubmit}>
+                        <ThemeProvider theme={theme}>
+                            <div>
+                                <TextField
+                                    required
+                                    id="iptCaption"
+                                    label="Caption"
+                                    className={classes.textField}
+                                    margin="normal"
+                                    variant="outlined"
+                                    InputProps={{className: classes.input}}
+                                    value={caption}
+                                    onChange={e => {
+                                        setCaption(e.target.value);
+                                        let img = document.getElementById("inputImage");
+                                        if (img)
+                                        {
+                                            img.alt = e.target.value;
+                                            img.title = e.target.value;
+                                        }
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <TextField
+                                    required
+                                    id="iptImage"
+                                    label="Image URL"
+                                    className={classes.textField}
+                                    margin="normal"
+                                    variant="outlined"
+                                    InputProps={{className: classes.input}}
+                                    value={imgUrl}
+                                    onChange={e => {
+                                        setImgUrl(e.target.value);
+                                        let img = document.getElementById("inputImage");
+                                        if (img) img.src = e.target.value;
+                                    }}
+                                />
+                            </div>
+                            <img src={imgUrl} id="inputImage" alt="" title="" className={classes.image}/>
+                            <div>
+                                <TextField
+                                    id="iptText"
+                                    label="Text"
+                                    className={classes.textField}
+                                    fullWidth
+                                    multiline
+                                    required
+                                    margin="normal"
+                                    InputLabelProps={{
+                                        color: "#fff"
+                                    }}
+                                    InputProps={{className: classes.input}}
+                                    variant="outlined"
+                                    value={text}
+                                    onChange={e => {
+                                        setText(e.target.value)
+                                    }}
+                                />
+                            </div>
+                            <div>
+                                <Button type="submit" label="Submit" className={classes.submitButton}
+                                >Submit</Button>
+                                <Button label="Delete"
+                                        className={classes.submitButton}
+                                        onClick={handleClick}
+                                        aria-controls="confirmation-dialog"
+                                        aria-haspopup="true"
+                                >Delete</Button>
+                            </div>
+                            <ConfirmationDialog
+                                id="confirmation-dialog"
+                                keepMounted
+                                open={open}
+                                onClose={handleClose}
+                                article={article}
+                            />
+                        </ThemeProvider>
+                    </form>
+                );
+            })}
+        </div>
+    );
+}
+
+function ConfirmationDialog(props)
+{
+    const {onClose, open, article, ...other} = props;
+    const handleCancel = () => {
+        onClose(false);
+    };
+
+    const handleOk = () => {
+        onClose(true);
+    };
+
+    return (
+        <Dialog
+            disableBackdropClick
+            disableEscapeKeyDown
+            maxWidth="xs"
+            open={open}
+            {...other}
+        >
+            <DialogTitle>Delete article</DialogTitle>
+            <DialogContent>Are you sure you want to delete article <i>{article.caption}</i></DialogContent>
+            <DialogActions>
+                <Button autoFocus onClick={handleCancel} color="primary">Cancel</Button>
+                <Button onClick={handleOk} color="primary" component={NavLink} to={`/`}>Delete</Button>
+            </DialogActions>
+        </Dialog>
+    );
+}
+
 function App(props)
 {
     let classes = useStyles();
     const [value, setValue] = React.useState(-1);
+    const [currentArticle, setCurrentArticle] = React.useState({});
+
     return (
         <div className={classes.app}>
             <header className="topnav">
@@ -466,8 +649,11 @@ function App(props)
                     <Route exact path="/"><FrontPage value={value} setValue={setValue}/></Route>
                     <Route path="/category/:id"
                            render={(props) => <CategoryView {...props} value={value} setValue={setValue}/>}/>
-                    <Route path="/article/:id" component={ArticleView}/>
+                    <Route path="/article/:id" render={(props) => <ArticleView {...props} value={currentArticle}
+                                                                               setValue={setCurrentArticle}/>}/>
                     <Route path="/new" component={NewArticleView}/>
+                    <Route path="/edit/:id" render={(props) => <EditArticleView {...props} value={currentArticle}
+                                                                                setValue={setCurrentArticle}/>}/>
                 </Switch>
                 {/*props.children*/}
             </div>
@@ -485,12 +671,6 @@ if (root)
     ReactDOM.render(
         <BrowserRouter>
             <App>
-
-                {/*<HashRouter>
-                <Route exact path="/" component={FrontPage}/>
-                <Route path="/category/:id" component={CategoryView}/>
-                <Route path="/article/:id" component={ArticleView}/>
-            </HashRouter>*/}
             </App>
         </BrowserRouter>
         ,
