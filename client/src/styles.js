@@ -79,5 +79,11 @@ export const useStyles = makeStyles(theme => ({
         "&:hover": {
             backgroundColor: "#111"
         }
+    },
+    marqueeButton: {
+        color: "#fff",
+        "&:hover": {
+            backgroundColor: "#111"
+        }
     }
 }));

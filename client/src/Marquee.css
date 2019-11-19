@@ -1,0 +1,10 @@
+@keyframes marquee {
+    0% {
+        transform: translate(0, 0);
+        animation-timing-function: linear;
+    }
+    100% {
+        transform: translate(-100%, 0);
+        animation-timing-function: linear;
+    }
+}

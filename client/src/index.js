@@ -33,6 +33,11 @@ import AddIcon from "@material-ui/icons/Add";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {useStyles} from "./styles.js";
 import {green} from "@material-ui/core/colors";
+import FormControl from "@material-ui/core/FormControl";
+import InputLabel from "@material-ui/core/InputLabel";
+import Select from "@material-ui/core/Select";
+import Marquee from 'grand-marquee-react';
+import './Marquee.css';
 
 let comments: Comment[];
 let users: User[];
@@ -170,9 +175,11 @@ function NavBar(props)
     return (
         <AppBar position="static">
             <Toolbar>
-                <Button href="/" className={classes.button} component={NavLink} to="/" onClick={p.setValue(1 / 0)}>
-                    <i className="fa fa-newspaper-o">StartSide</i>
-                </Button>
+                <Button
+                    label={<div><i className="fa fa-newspaper-o"/>StartSide</div>}
+                    to="/"
+                    component={NavLink}
+                ><i className="fa fa-newspaper-o"/>StartSide</Button>
                 <TabList setValue={p.setValue}/>
                 <div className={classes.searchBar}>
                     <Box display="flex" flexDirection="row">
@@ -183,6 +190,7 @@ function NavBar(props)
                             className={classes.searchField}
                             margin="normal"
                             variant="outlined"
+                            onChange={e => p.setSearch(e.target.value)}
                         />
                         <IconButton
                             aria-label="search button"
@@ -191,8 +199,11 @@ function NavBar(props)
                             color="inherit"
                             type="submit"
                             className={classes.searchButton}
+                            component={NavLink}
+                            to={`/search/${p.search}`}
                         >
                             <i className="fa fa-search"/></IconButton>
+
                     </Box>
                 </div>
                 {authorized && (
@@ -253,7 +264,8 @@ function FrontPage(props)
 
     return (
         <div aria-label="main content" className={classes.root}>
-            <Grid container direction="row" justify="row-begin" alignItems="stretch" id="grid" className={classes.grid}>
+            <Grid container direction="row" justify="flex-start" alignItems="stretch" id="grid"
+                  className={classes.grid}>
                 {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
                     varian="h5">Loading...</Typography></CardContent></Card>}
                 {articleStore.articles.map((article) => {
@@ -275,26 +287,26 @@ export function ArticleCard(props)
 
     return (
         <Card className={classes.articleShort}>
-            <NavLink to={`/article/${p.id}`} className={classes.navlink}>
-                <CardActionArea href={`/article/${p.id}`}>
-                    {p.imageUrl ? (
-                        <CardMedia
-                            component="img"
-                            alt={p.caption}
-                            height="140"
-                            image={p.imageUrl}
-                            title={p.caption}
-                        />) : (<></>)}
-                    <CardContent>
-                        <Typography gutterBottom variant="h5" component="h2" className={classes.cardCaption}>
-                            {p.caption}
-                        </Typography>
-                        <Typography variant="body2" color="textSecondary" component="p" className={classes.cardText}>
-                            {p.content.substring(0, 100) + (p.content.substring(0, 100).length < p.content.length ? '...' : '')}
-                        </Typography>
-                    </CardContent>
-                </CardActionArea>
-            </NavLink>
+
+            <CardActionArea component={NavLink} to={`/article/${p.id}`}>
+                {p.imageUrl ? (
+                    <CardMedia
+                        component="img"
+                        alt={p.caption}
+                        height="140"
+                        image={p.imageUrl}
+                        title={p.caption}
+                    />) : (<></>)}
+                <CardContent>
+                    <Typography gutterBottom variant="h5" component="h2" className={classes.cardCaption}>
+                        {p.caption}
+                    </Typography>
+                    <Typography variant="body2" color="textSecondary" component="p" className={classes.cardText}>
+                        {p.content.substring(0, 100) + (p.content.substring(0, 100).length < p.content.length ? '...' : '')}
+                    </Typography>
+                </CardContent>
+            </CardActionArea>
+
             <CardActions></CardActions>
         </Card>
     );
@@ -311,7 +323,7 @@ function CategoryView(props)
             articleStore.setArticles(response);
             setIsLoading(false);
         }).catch(error => console.error(error))
-    }, [isLoading, props]);
+    }, [isLoading]);
 
     return (
         <div aria-label="main content" className={classes.root}>
@@ -347,17 +359,18 @@ function ArticleView(props)
         <div aria-label="main content" className={classes.root}>
             {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
                 varian="h5">Loading...</Typography></CardContent></Card>}
-            {articleStore.articles.map(article => {
+            {!isLoading && articleStore.articles.map(article => {
                 return (
                     <div>
                         {article.imageUrl ?
                             <img src={article.imageUrl} alt={article.caption} title={article.caption}/> : <></>}
                         <h1>{article.caption}</h1>
                         <a href={`/user/${article.writerId}`}>{article.writerId}</a>
-                        <div>{article.createdAt} {console.log(article.createdAt)}</div>
+                        <div>{article.createdAt}</div>
                         <div>{article.content}</div>
                         {authorized &&
-                        <NavLink to={`/edit/${article.id}`} className={classes.navlink}><Button>Edit</Button></NavLink>}
+                        <Button to={`/edit/${article.id}`} component={NavLink}
+                                className={classes.submitButton}>Edit</Button>}
                     </div>
                 );
             })}
@@ -377,14 +390,23 @@ function NewArticleView()
     const [caption, setCaption] = React.useState("");
     const [imgUrl, setImgUrl] = React.useState("");
     const [text, setText] = React.useState("");
+    const [priority, setPriority] = React.useState(1);
+    const [category, setCategory] = React.useState(1);
+    const priorityLabel = React.useRef(1);
+    const categoryLabel = React.useRef(0);
+    const [labelWidth, setLabelWidth] = React.useState(0);
+    React.useEffect(() => {
+        setLabelWidth(priorityLabel.current.offsetWidth);
+        setLabelWidth(categoryLabel.current.offsetWidth);
+    }, []);
 
     const handleSubmit = event => {
         articleStore.postArticle({
             caption: caption,
             imageUrl: imgUrl,
             content: text,
-            categoryId: 0,
-            priority: 0
+            categoryId: category,
+            priority: priority
         }).then(response => alert(response));
     };
 
@@ -396,7 +418,6 @@ function NewArticleView()
                         required
                         id="iptCaption"
                         label="Caption"
-                        defaultValue=""
                         className={classes.textField}
                         margin="normal"
                         variant="outlined"
@@ -418,7 +439,6 @@ function NewArticleView()
                         required
                         id="iptImage"
                         label="Image URL"
-                        defaultValue=""
                         className={classes.textField}
                         margin="normal"
                         variant="outlined"
@@ -453,6 +473,45 @@ function NewArticleView()
                     />
                 </div>
                 <div>
+                    <FormControl variant="outlined" className={classes.formControl}>
+                        <InputLabel ref={priorityLabel} id="priorityLabel">
+                            Priority
+                        </InputLabel>
+                        <Select
+                            labelId="priorityLabel"
+                            id="priorityLabel"
+                            value={priority}
+                            onChange={e => setPriority(e.target.value)}
+                            labelWidth={labelWidth}
+                        >
+                            <MenuItem value={0}>High</MenuItem>
+                            <MenuItem value={1}>Low</MenuItem>
+                        </Select>
+                    </FormControl>
+                </div>
+                <div>
+                    <FormControl variant="outlined" className={classes.formControl}>
+                        <InputLabel ref={categoryLabel} id="categoryLabel">
+                            Category
+                        </InputLabel>
+                        <Select
+                            labelId="categoryLabel"
+                            id="categoryLabel"
+                            value={category}
+                            onChange={e => {
+                                setCategory(e.target.value);
+                                console.log(e.target.value)
+                            }}
+                            labelWidth={labelWidth}
+                        >
+                            {categoryStore.categories.map(category => {
+                                return <MenuItem value={category.categoryId}
+                                                 key={`category-${category.categoryId}`}>{category.categoryName}</MenuItem>
+                            })};
+                        </Select>
+                    </FormControl>
+                </div>
+                <div>
                     <Button type="submit" label="Submit" className={classes.submitButton}>Submit</Button>
                 </div>
             </ThemeProvider>
@@ -468,6 +527,12 @@ function EditArticleView(props)
     const [imgUrl, setImgUrl] = React.useState(props.value.imageUrl);
     const [text, setText] = React.useState(props.value.content);
     const [open, setOpen] = React.useState(false);
+    const [priority, setPriority] = React.useState(props.value.priority);
+    const inputLabel = React.useRef(1);
+    const [labelWidth, setLabelWidth] = React.useState(0);
+    React.useEffect(() => {
+        setLabelWidth(inputLabel.current.offsetWidth);
+    }, []);
 
     React.useEffect(() => {
         articleStore.getArticlesById(props.value.id)
@@ -477,7 +542,6 @@ function EditArticleView(props)
                         setCaption(response.caption);
                         setImgUrl(response.imageUrl);
                         setText(response.content);
-                        console.log(caption + " " + imgUrl + " " + text);
                     })
                     .catch(error => console.error(error));
     }, []);
@@ -487,20 +551,18 @@ function EditArticleView(props)
         if (!caption) setCaption(articleStore.articles[0].caption);
         if (!imgUrl) setImgUrl(articleStore.articles[0].imageUrl);
         if (!text) setText(articleStore.articles[0].content);
-        articleStore.updateArticle({
-            caption: caption,
-            imageUrl: imgUrl,
-            content: text,
-            categoryId: 0,
-            priority: 0
-        });
+        articleStore.articles[0].caption = caption;
+        articleStore.articles[0].imageUrl = imgUrl;
+        articleStore.articles[0].content = text;
+        articleStore.articles[0].priority = priority;
+        articleStore.updateArticle(articleStore.articles[0]).then(r => alert("Article updated"));
     };
 
     const handleClose = del => {
+        setOpen(false);
         if (del)
         {
-            ArticleStore.deleteArticle(props.value.id);
-            alert("Article deleted")
+            articleStore.deleteArticle(props.value.id).then(r => alert("Article deleted"));
         }
     };
 
@@ -579,6 +641,23 @@ function EditArticleView(props)
                                 />
                             </div>
                             <div>
+                                <FormControl variant="outlined" className={classes.formControl}>
+                                    <InputLabel ref={inputLabel} id="inputLabel">
+                                        Priority
+                                    </InputLabel>
+                                    <Select
+                                        labelId="selectLabel"
+                                        id="selectLabel"
+                                        value={priority}
+                                        onChange={e => setPriority(e.target.value)}
+                                        labelWidth={labelWidth}
+                                    >
+                                        <MenuItem value={0}>High</MenuItem>
+                                        <MenuItem value={1}>Low</MenuItem>
+                                    </Select>
+                                </FormControl>
+                            </div>
+                            <div>
                                 <Button type="submit" label="Submit" className={classes.submitButton}
                                 >Submit</Button>
                                 <Button label="Delete"
@@ -632,17 +711,86 @@ function ConfirmationDialog(props)
     );
 }
 
+function LiveFeed(props)
+{
+    const classes = useStyles();
+
+    const [isLoading, setIsLoading] = React.useState(true);
+    const [articles, setArticles] = React.useState([]);
+
+    React.useEffect(() => {
+        articleStore.getFirstArticles().then(response => {
+            setArticles(response);
+            setIsLoading(false);
+        }).catch(error => console.error(error))
+    }, [isLoading]);
+
+    return (
+        <div className="Marquee" style={{minHeight: "40px"}}>
+            {isLoading && <div>Lodaing...</div>}
+            {!isLoading && <Marquee
+                totalDisplays={5}
+                display1={<Button className={classes.marqueeButton} component={NavLink}
+                                  to={`/article/${articles[0].id}`}>{articles[0].caption}</Button>}
+                display2={<Button className={classes.marqueeButton} component={NavLink}
+                                  to={`/article/${articles[1].id}`}>{articles[1].caption}</Button>}
+                display3={<Button className={classes.marqueeButton} component={NavLink}
+                                  to={`/article/${articles[2].id}`}>{articles[2].caption}</Button>}
+                display4={<Button className={classes.marqueeButton} component={NavLink}
+                                  to={`/article/${articles[3].id}`}>{articles[3].caption}</Button>}
+                display5={<Button className={classes.marqueeButton} component={NavLink}
+                                  to={`/article/${articles[4].id}`}>{articles[4].caption}</Button>}
+                changeTime={16000}
+                crossTime={16000}
+                randomDisplayChange={false}
+                color={'white'}
+            />}
+        </div>
+    )
+}
+
+function SearchView(props)
+{
+    const classes = useStyles();
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        articleStore.getArticlesLike(props.value).then(response => {
+            articleStore.setArticles(response);
+            setIsLoading(false);
+        }).catch(error => console.error(error))
+    }, [isLoading]);
+
+    return (
+        <div aria-label="main content" className={classes.root}>
+            <Grid container direction="row" justify="row-begin" alignItems="stretch" id="grid" className={classes.grid}>
+                {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
+                    varian="h5">Loading...</Typography></CardContent></Card>}
+                {!isLoading && articleStore.articles.map((article) => {
+                    return (
+                        <Grid item xs={12} sm={5} md={4} lg={3} xl={2} key={article.id}>
+                            <ArticleCard props={article} key={article.id} id={`article-${article.id}`}/>
+                        </Grid>
+                    );
+                })}
+            </Grid>
+        </div>
+    )
+}
+
 function App(props)
 {
     let classes = useStyles();
     const [value, setValue] = React.useState(-1);
     const [currentArticle, setCurrentArticle] = React.useState({});
+    const [search, setSearch] = React.useState("");
 
     return (
         <div className={classes.app}>
             <header className="topnav">
-                <NavBar setValue={setValue}/>
+                <NavBar setValue={setValue} search={search} setSearch={setSearch}/>
             </header>
+            <LiveFeed/>
             <div id='mainContent'>
                 <div style={{height: "10px"}}/>
                 <Switch>
@@ -654,6 +802,7 @@ function App(props)
                     <Route path="/new" component={NewArticleView}/>
                     <Route path="/edit/:id" render={(props) => <EditArticleView {...props} value={currentArticle}
                                                                                 setValue={setCurrentArticle}/>}/>
+                    <Route path="/search/:search" render={(props) => <SearchView {...props} value={search}/>}/>
                 </Switch>
                 {/*props.children*/}
             </div>

@@ -1,11 +1,15 @@
 // @flow
 
+import * as Sequelize from "sequelize";
+
 const model = require('./model.js');
 const express = require("express");
 const mysql = require("mysql");
 const app = express();
 const bodyParser = require("body-parser");
 const cors = require('cors');
+
+const Op = Sequelize.Op;
 
 app.use(bodyParser.json()); // for å tolke JSON
 app.use(cors());
@@ -27,7 +31,7 @@ app.get("/news", (req, res) => {
     return model.ArticleModel.findAll({order: [['createdAt', 'DESC']]}).then(article => res.send(article));
 });
 
-app.post("/news", (req, res) => {
+app.post("/news/article", (req, res) => {
     console.log("POST-request received from client");
     return model.ArticleModel.create({
         caption: req.body.caption,
@@ -35,10 +39,12 @@ app.post("/news", (req, res) => {
         imageUrl: ((req.body.imageUrl != null && req.body.imageUrl !== '') ? req.body.imageUrl : null),
         categoryId: req.body.categoryId,
         priority: req.body.priority
-    });
+    })
+                .then(res.sendStatus(201))
+                .catch(error => console.log(error));
 });
 
-app.get("/category/:categoryId", (req, res) => {
+app.get("/news/category/:categoryId", (req, res) => {
     console.log("GET-request received from client");
     return model.ArticleModel.findAll({
         where: {
@@ -48,14 +54,12 @@ app.get("/category/:categoryId", (req, res) => {
     }).then(article => res.send(article));
 });
 
-app.get("/categories", (req, res) => {
+app.get("/news/categories", (req, res) => {
     console.log("GET-request received from client");
-    return model.CategoryModel.findAll({
-        order: [['createdAt', 'DESC']]
-    }).then(category => res.send(category));
+    return model.CategoryModel.findAll().then(category => res.send(category));
 });
 
-app.get("/news/:id", (req, res) => {
+app.get("/news/article/:id", (req, res) => {
     console.log("GET-request received from client");
     return model.ArticleModel.findAll({
         where: {
@@ -67,7 +71,7 @@ app.get("/news/:id", (req, res) => {
                 .catch(error => console.error(error));
 });
 
-app.put("/news/:id", (req, res) => {
+app.put("/news/article/:id", (req, res) => {
     console.log("PUT-request received from client");
     return model.ArticleModel.update({
         caption: req.body.caption,
@@ -80,16 +84,31 @@ app.put("/news/:id", (req, res) => {
             id: req.body.id
         }
     })
-                .then(res.send(204))
-                .catch(res.send(404))
+                .then(res.sendStatus(204))
                 .catch(error => console.error(error));
 });
 
-app.delete("/news/:id", (req, res) => {
-    console.log("DELETE-request received from clien");
-    return model.ArticleModel.destroy({where: {id: req.params.id}})
-                .then(res.send(204))
-                .catch(res.send(404))
+app.delete("/news/article/:id", (req, res) => {
+    console.log("DELETE-request received from client");
+    return model.ArticleModel.destroy({where: {id: req.body.id}})
+                .then(res.sendStatus(204))
+                .catch(error => console.error(error));
+});
+
+app.get("/news/first", (req, res) => {
+    console.log("GET-request received from client");
+    return model.ArticleModel.findAll({order: [['createdAt', 'DESC']], limit: 5})
+                .then(articles => res.send(articles))
+                .catch(error => console.error(error));
+});
+
+app.get("/news/search/:searchText", (req, res) => {
+    console.log("GET-request received from client");
+    return model.ArticleModel.findAll({
+        where: {[Op.or]: [{caption: {[Op.like]: `%${req.params.searchText}%`}}, {content: {[Op.like]: `%${req.params.searchText}%`}}]},
+        order: [['createdAt', 'DESC']]
+    })
+                .then(article => res.send(article))
                 .catch(error => console.error(error));
 });
 

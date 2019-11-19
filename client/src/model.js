@@ -5,7 +5,7 @@ import React from "react";
 
 let _localhost = "http://localhost:4000";
 
-class Article
+export class Article
 {
     caption: string;
     writerId: number;
@@ -46,30 +46,46 @@ export class ArticleStore
 
     getArticlesByCategory(category: number)
     {
-        return axios.get(_localhost + `/category/${category}/`).then(response => {
+        return axios.get(_localhost + `/news/category/${category}/`).then(response => {
             this.setArticles(response.data);
             return response.data;
         });
     }
 
-    getArticlesById(id:number)
+    getArticlesById(id: number)
     {
-        return axios.get(_localhost + `/news/${id}/`).then(response => {
+        return axios.get(_localhost + `/news/article/${id}/`).then(response => {
             return response.data;
         });
     }
 
     postArticle(article: Article)
     {
-        return axios.post(_localhost + `/news`, article).then(response => {
+        return axios.post(_localhost + `/news/article`, article).then(response => {
             return response.data;
         })
     }
 
-    updateArticle(props)
+    updateArticle(article: Article)
     {
-        console.log(props);
-        //return axios.put(_localhost + `/news/${props.}`)
+        return axios.put(_localhost + `/news/article/${article.id}`, article)
+    }
+
+    deleteArticle(id: number)
+    {
+        return axios.delete(_localhost + `/news/article/${id}`, {data: {id: id}}).then(response => {
+            return response.data;
+        })
+    }
+
+    getFirstArticles(num: number)
+    {
+        return axios.get(_localhost + `/news/first`).then(response => response.data);
+    }
+
+    getArticlesLike(searchText: string)
+    {
+        return axios.get(_localhost + `/news/search/${searchText}`).then(response => response.data);
     }
 }
 
@@ -90,7 +106,7 @@ export class CategoryStore
 
     getCategories()
     {
-        return axios.get(_localhost + '/categories').then(response => {
+        return axios.get(_localhost + '/news/categories').then(response => {
             return response.data;
         });
     }
