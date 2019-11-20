@@ -3,7 +3,7 @@
 import axios from "axios";
 import React from "react";
 
-let _localhost = "http://localhost:4000";
+let host = "http://localhost:4000";
 
 export class Article
 {
@@ -38,7 +38,7 @@ export class ArticleStore
 
     getArticles()
     {
-        return axios.get(_localhost + '/news/').then(response => {
+        return axios.get(host + '/news/').then(response => {
             this.setArticles(response.data);
             return response.data;
         });
@@ -46,7 +46,7 @@ export class ArticleStore
 
     getArticlesByCategory(category: number)
     {
-        return axios.get(_localhost + `/news/category/${category}/`).then(response => {
+        return axios.get(host + `/news/category/${category}/`).then(response => {
             this.setArticles(response.data);
             return response.data;
         });
@@ -54,38 +54,38 @@ export class ArticleStore
 
     getArticlesById(id: number)
     {
-        return axios.get(_localhost + `/news/article/${id}/`).then(response => {
+        return axios.get(host + `/news/article/${id}/`).then(response => {
             return response.data;
         });
     }
 
     postArticle(article: Article)
     {
-        return axios.post(_localhost + `/news/article`, article).then(response => {
+        return axios.post(host + `/news/article`, article).then(response => {
             return response.data;
         })
     }
 
     updateArticle(article: Article)
     {
-        return axios.put(_localhost + `/news/article/${article.id}`, article)
+        return axios.put(host + `/news/article/${article.id}`, article)
     }
 
     deleteArticle(id: number)
     {
-        return axios.delete(_localhost + `/news/article/${id}`, {data: {id: id}}).then(response => {
+        return axios.delete(host + `/news/article/${id}`, {data: {id: id}}).then(response => {
             return response.data;
         })
     }
 
     getFirstArticles(num: number)
     {
-        return axios.get(_localhost + `/news/first`).then(response => response.data);
+        return axios.get(host + `/news/first`).then(response => response.data);
     }
 
     getArticlesLike(searchText: string)
     {
-        return axios.get(_localhost + `/news/search/${searchText}`).then(response => response.data);
+        return axios.get(host + `/news/search/${searchText}`).then(response => response.data);
     }
 }
 
@@ -106,7 +106,7 @@ export class CategoryStore
 
     getCategories()
     {
-        return axios.get(_localhost + '/news/categories').then(response => {
+        return axios.get(host + '/news/categories').then(response => {
             return response.data;
         });
     }
