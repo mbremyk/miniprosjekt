@@ -17,7 +17,7 @@ before_script:
 run_tests:
   stage: test
   script:
-    - npm test
+    - cd client && npm install && npm test && flow check src
   artifacts:
     paths:
       - coverage/
