@@ -10,8 +10,8 @@ variables:
   MYSQL_ROOT_PASSWORD: secret
 
 # Install node libraries
-#before_script:
-#  - npm install
+before_script:
+  - npm install
 
 # Run JEST tests
 run_tests:
