@@ -30,5 +30,11 @@ afterAll(() => {
 test("dummy test", () => {
     console.log("Dummy test");
     expect(article.caption).toBe("Caption");
+    expect(article.writerId).toBe(0);
+    expect(article.id).toBe(0);
+    expect(article.text).toBe("Content");
+    expect(article.imageUrl).toBe("img.org");
 });
+
+
 

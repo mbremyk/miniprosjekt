@@ -1,7 +1,10 @@
 const Sequelize = require('sequelize');
 const credentials = require('./credentials.js');
 
-let sequelize = new Sequelize(credentials.Credentials.database, credentials.Credentials.username, credentials.Credentials.password, {
+let sequelize = process.env.CI ? new Sequelize("School", "root", "", {
+    host: "mysql",
+    dialect: "mysql"
+}) : new Sequelize(credentials.Credentials.database, credentials.Credentials.username, credentials.Credentials.password, {
     host: credentials.Credentials.host,//process.env.CI ? 'mysql' : 'localhost', // The host is 'mysql' when running in gitlab CI
     dialect: credentials.Credentials.dialect
 });
@@ -15,7 +18,7 @@ sequelize
         console.error('Unable to connect to the database:', err);
     });
 
-type Article = {
+export type Article = {
     id?: number,
     caption: string,
     content: string,
@@ -32,11 +35,11 @@ let ArticleModel: Class<Sequelize.Model<Article>> = sequelize.define('article', 
     imageUrl: Sequelize.STRING,
     categoryId: Sequelize.INTEGER,
     priority: Sequelize.INTEGER
-},{
+}, {
     tableName: 'article'
 });
 
-type Category = {
+export type Category = {
     categoryId: number,
     categoryName: string
 }
@@ -44,8 +47,11 @@ type Category = {
 let CategoryModel: Class<Sequelize.Model<Category>> = sequelize.define('category', {
     categoryId: {type: Sequelize.INTEGER, primaryKey: true, autoIncrement: true},
     categoryName: Sequelize.STRING
-},{
+}, {
     tableName: 'category'
 });
+
+let production = process.env.NODE_ENV === 'production';
+console.log(process.env.NODE_ENV);
 
 module.exports = {ArticleModel, CategoryModel};

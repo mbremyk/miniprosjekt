@@ -730,6 +730,7 @@ function LiveFeed(props)
             {isLoading && <div>Lodaing...</div>}
             {!isLoading && <Marquee
                 totalDisplays={5}
+
                 display1={<Button className={classes.marqueeButton} component={NavLink}
                                   to={`/article/${articles[0].id}`}>{articles[0].caption}</Button>}
                 display2={<Button className={classes.marqueeButton} component={NavLink}

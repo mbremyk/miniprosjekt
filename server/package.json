@@ -5,7 +5,8 @@
   "main": "server.js",
   "scripts": {
     "start": "babel-node server.js",
-    "flow": "flow"
+    "flow": "flow",
+    "start-prod": "cross-env NODE_ENV=production react-scripts test"
   },
   "author": "Brevik Magnus",
   "license": "ISC",
