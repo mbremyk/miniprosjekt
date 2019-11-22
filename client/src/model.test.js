@@ -32,7 +32,7 @@ test("dummy test", () => {
     expect(article.caption).toBe("Caption");
     expect(article.writerId).toBe(0);
     expect(article.id).toBe(0);
-    expect(article.text).toBe("Content");
+    expect(article.content).toBe("Content");
     expect(article.imageUrl).toBe("img.org");
 });
 
