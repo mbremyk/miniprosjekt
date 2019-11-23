@@ -15,9 +15,9 @@ before_script:
 
 # Run JEST tests
 run_tests:
-  stage: tests
+  stage: test
   script:
-    - cd client && npm install && npm tests
+    - cd client && npm install && npm test
   artifacts:
     paths:
       - coverage/
