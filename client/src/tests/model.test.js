@@ -1,4 +1,4 @@
-import {Article} from "./model";
+import {Article} from "../model";
 
 let article: Article;
 
@@ -7,7 +7,7 @@ beforeAll(() => {
 });
 
 beforeEach(() => {
-    console.log("Starting test");
+    console.log("Starting tests");
     article = new Article(
         "Caption",
         0,
@@ -27,8 +27,8 @@ afterAll(() => {
     console.log("All tests ended");
 });
 
-test("dummy test", () => {
-    console.log("Dummy test");
+test("dummy tests", () => {
+    console.log("Dummy tests");
     expect(article.caption).toBe("Caption");
     expect(article.writerId).toBe(0);
     expect(article.id).toBe(0);

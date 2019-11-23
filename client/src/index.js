@@ -1,7 +1,7 @@
 // @flow
 
 import React from 'react';
-import {Component, sharedComponentData} from 'react-simplified';
+import {Component} from 'react-simplified';
 import ReactDOM from 'react-dom';
 import {
     AppBar,
@@ -28,7 +28,7 @@ import {
 } from '@material-ui/core';
 import {BrowserRouter, NavLink, Route, Switch} from 'react-router-dom';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import {ArticleStore, CategoryStore, Comment, User} from "./model.js";
+import {articleStore, categoryStore, User} from "./model.js";
 import AddIcon from "@material-ui/icons/Add";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {useStyles} from "./styles.js";
@@ -37,14 +37,10 @@ import FormControl from "@material-ui/core/FormControl";
 import InputLabel from "@material-ui/core/InputLabel";
 import Select from "@material-ui/core/Select";
 import Marquee from 'grand-marquee-react';
-import './Marquee.css';
+import marquee from './Marquee.css';
 
-let comments: Comment[];
-let users: User[];
 let currentUser: User;
 let authorized: boolean = true;
-let articleStore = sharedComponentData(new ArticleStore());
-let categoryStore = sharedComponentData(new CategoryStore());
 let categoryTab: number;
 
 let setAuthorized = auth => {
@@ -55,9 +51,9 @@ let setCategoryTab = tab => {
     categoryTab = tab;
 };
 
-users = [new User('Magnus', '#'), new User('Mikael', '#'), new User('Thomas', '#')];
+/*users = [new User('Magnus', '#'), new User('Mikael', '#'), new User('Thomas', '#')];
 comments = [new Comment(users[0], 'Hei'), new Comment(users[1], 'Jabbadabbadoo'), new Comment(users[2], 'SomeBODY ONCE TOLD ME'),];
-currentUser = users[0];
+currentUser = users[0];*/
 
 class Tag extends Component<{ props: { text: string, linkTo: string } }>
 {
@@ -111,12 +107,13 @@ function CommentList()
     );
 }
 
-function TabList(props)
+export function TabList(props)
 {
     const [isLoading, setIsLoading] = React.useState(true);
     const classes = useStyles();
 
     const handleChange = (event, newValue) => {
+        setIsLoading(true);
         articleStore.getArticlesByCategory(newValue).then(response => {
             props.setValue(newValue);
             articleStore.setArticles(response);
@@ -127,10 +124,11 @@ function TabList(props)
     };
 
     React.useEffect(() => {
+        setIsLoading(true);
         categoryStore.getCategories().then(response => {
             categoryStore.setCategories(response);
             setIsLoading(false);
-        }).catch(error => console.error(error))
+        }).catch(error => console.error(error));
     });
 
     return (
@@ -726,7 +724,7 @@ function LiveFeed(props)
     }, [isLoading]);
 
     return (
-        <div className="Marquee" style={{minHeight: "40px"}}>
+        <div className={marquee} style={{minHeight: "40px"}}>
             {isLoading && <div>Lodaing...</div>}
             {!isLoading && <Marquee
                 totalDisplays={5}

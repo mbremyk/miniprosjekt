@@ -7,7 +7,7 @@
     "postinstall": "node scripts/enable_babelrc.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "react-scripts test",
+    "test": "jest",
     "flow": "flow"
   },
   "keywords": [],
@@ -22,6 +22,7 @@
     "clsx": "^1.0.4",
     "flow": "^0.2.3",
     "grand-marquee-react": "0.0.6",
+    "identity-obj-proxy": "^3.0.0",
     "react": "^16.11.0",
     "react-dom": "^16.11.0",
     "react-router-dom": "^5.1.2",
@@ -59,5 +60,16 @@
     "history": "^4.10.1",
     "jest": "^24.9.0"
   },
-  "proxy": "http://localhost:4000"
+  "proxy": "http://localhost:4000",
+  "jest": {
+    "testRegex": "./tests/.+\\.test\\.js$",
+    "setupFiles": [
+      "./src/tests/setup.js"
+    ],
+    "testURL": "http://localhost",
+    "moduleNameMapper": {
+      "\\.(jpg|jpeg|png|gif|eot|otf|webp|svg|ttf|woff|woff2|mp4|webm|wav|mp3|m4a|aac|oga)$": "<rootDir>/client/src/__mocks__/fileMock.js",
+      "\\.(css|less)$": "identity-obj-proxy"
+    }
+  }
 }

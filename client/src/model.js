@@ -2,6 +2,7 @@
 
 import axios from "axios";
 import React from "react";
+import {sharedComponentData} from "react-simplified";
 
 let host = "http://localhost:4000";
 
@@ -89,7 +90,7 @@ export class ArticleStore
     }
 }
 
-class Category
+export class Category
 {
     categoryId: number;
     categoryName: string;
@@ -138,3 +139,6 @@ export class Comment
         this.text = text;
     }
 }
+
+export let articleStore = sharedComponentData(new ArticleStore());
+export let categoryStore = sharedComponentData(new CategoryStore());

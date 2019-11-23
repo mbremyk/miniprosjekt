@@ -1,10 +1,10 @@
 image: node:8
 
-# Set up MySQL test-database
+# Set up MySQL tests-database
 services:
   - mysql:latest
 
-# Configure test-database
+# Configure tests-database
 variables:
   MYSQL_DATABASE: supertestdb
   MYSQL_ROOT_PASSWORD: secret
@@ -15,9 +15,9 @@ before_script:
 
 # Run JEST tests
 run_tests:
-  stage: test
+  stage: tests
   script:
-    - cd client && npm install && npm test
+    - cd client && npm install && npm tests
   artifacts:
     paths:
       - coverage/
