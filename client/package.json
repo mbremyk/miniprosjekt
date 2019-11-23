@@ -7,7 +7,7 @@
     "postinstall": "node scripts/enable_babelrc.js",
     "start": "react-scripts start",
     "build": "react-scripts build",
-    "test": "jest",
+    "test": "jest ./src/tests",
     "flow": "flow"
   },
   "keywords": [],
