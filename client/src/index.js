@@ -82,14 +82,16 @@ function CommentField(props)
             <TextField
                 required
                 id="txtName"
-                label="Label"
+                label="Name"
                 style={{margin: 8}}
                 placeholder="Name"
                 helperText="Your name here"
                 margin="normal"
                 variant="outlined"
+                InputProps={{className: classes.textField}}
                 InputLabelProps={{
                     shrink: true,
+                    className: classes.input
                 }}
                 onChange={e => {
                     setUser(e.target.value);
@@ -105,8 +107,10 @@ function CommentField(props)
                 fullWidth
                 margin="normal"
                 variant="outlined"
+                InputProps={{className: classes.textField}}
                 InputLabelProps={{
                     shrink: true,
+                    className: classes.input
                 }}
                 onChange={e => {
                     setComment(e.target.value);
@@ -119,7 +123,6 @@ function CommentField(props)
 
 function CommentList(props)
 {
-    const comments = props.comments;
     const classes = useStyles();
     const [isLoading, setIsLoading] = React.useState(true);
 
@@ -136,9 +139,9 @@ function CommentList(props)
                 {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
                     varian="h5">Loading...</Typography></CardContent></Card>}
                 {!isLoading && commentStore.comments.map(comment => (
-                    <div>
-                        <h4>{comment.commenter}</h4>
-                        <div>{comment.text}</div>
+                    <div className={classes.input}>
+                        <h4>{comment.user}</h4>
+                        <div className={classes.commentText}>{comment.text}</div>
                     </div>
                 ))}
             </ul>
@@ -459,6 +462,7 @@ function NewArticleView()
                         margin="normal"
                         variant="outlined"
                         InputProps={{className: classes.input}}
+                        InputLabelProps={{className: classes.input}}
                         value={caption}
                         onChange={e => {
                             setCaption(e.target.value);
@@ -480,6 +484,7 @@ function NewArticleView()
                         margin="normal"
                         variant="outlined"
                         InputProps={{className: classes.input}}
+                        InputLabelProps={{className: classes.input}}
                         value={imgUrl}
                         onChange={e => {
                             setImgUrl(e.target.value);
@@ -502,6 +507,7 @@ function NewArticleView()
                             color: "#fff"
                         }}
                         InputProps={{className: classes.input}}
+                        InputLabelProps={{className: classes.input}}
                         variant="outlined"
                         value={text}
                         onChange={e => {
@@ -763,7 +769,7 @@ function LiveFeed(props)
 
     return (
         <div className={marquee} style={{minHeight: "40px"}}>
-            {isLoading && <div>Lodaing...</div>}
+            {isLoading && <div>Loading...</div>}
             {!isLoading && <Marquee
                 totalDisplays={5}
 

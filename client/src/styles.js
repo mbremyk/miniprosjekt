@@ -57,6 +57,7 @@ export const useStyles = makeStyles(theme => ({
         },
     },
     textField: {
+        color: "#ddd",
         backgroundColor: "#333"
     },
     input: {
@@ -85,5 +86,8 @@ export const useStyles = makeStyles(theme => ({
         "&:hover": {
             backgroundColor: "#111"
         }
+    },
+    commentText: {
+        paddingLeft: "20px"
     }
 }));
