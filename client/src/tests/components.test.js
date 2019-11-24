@@ -2,15 +2,17 @@ import * as React from 'react';
 import {shallow} from "enzyme";
 import {TabList} from "../index.js";
 import {categoryStore} from "../model.js";
-import {NavLink} from "react-router-dom";
+import {Tabs} from "@material-ui/core";
+import {articleStore} from "../model";
+import type {Article} from "../../../server/model";
 
-describe('Category tests', () => {
+describe('TabList tests', () => {
     let tabs = [{categoryId: 0, categoryName: "cat1"}, {categoryId: 1, categoryName: "cat2"}];
 
     const a = jest.spyOn(categoryStore, "getCategories").mockResolvedValue(tabs);
     categoryStore.getCategories().then(response => {
         categoryStore.setCategories(response);
-    });
+    }).catch(error => console.error(error));
 
     let value;
     const setValue = (newValue) => {
@@ -25,34 +27,60 @@ describe('Category tests', () => {
         />
     );
 
-    it('fetches categories and saves them in categoryStore', () => {
-        let instances = categoryStore.categories;
-        expect(typeof instances[0]).toEqual('object');
-        expect(instances[0].categoryId).toBe(0);
-        expect(instances[0].categoryName).toBe("cat1");
-        expect(typeof instances[1]).toEqual('object');
-        expect(instances[1].categoryId).toBe(1);
-        expect(instances[1].categoryName).toBe("cat2");
-    });
-
-    it('renders TabList', () => {
-        let instance;
-        categoryStore.getCategories().then(() => {
-            instance = wrapper.instance();
-            expect(instance.find('Tab[id=tab-0]').props()).toEqual({
-                label: 'cat1',
-                component: NavLink,
-                to: '/category/0',
-                'aria-controls': 'tabpanel-0',
-                key: 0
-            });
-            expect(wrapper.find('Tab[id=tab-1]').props()).toEqual({
-                label: 'cat2',
-                component: NavLink,
-                to: '/category/1',
-                'aria-controls': 'tabpanel-1',
-                key: 1
-            });
+    beforeEach(() => {
+        categoryStore.getCategories().then(response => {
+            categoryStore.setCategories(response);
         });
     });
+
+    it('renders TabList with Tabs component', () => {
+        expect(wrapper.find(Tabs).length).toBe(1);
+    });
+});
+
+describe("ArticleCard tests", () => {
+    let articles: Article[] = [{
+        caption: "art1",
+        writerId: 0,
+        id: 0,
+        createdAt: new Date(),
+        content: "art1",
+        imageUrl: "url1",
+        updatedAt: new Date()
+    }, {
+        caption: "art2",
+        writerId: 1,
+        id: 1,
+        createdAt: new Date(),
+        content: "art2",
+        imageUrl: "url2",
+        updatedAt: new Date()
+    }];
+
+    const a = jest.spyOn(articleStore, "getArticles").mockResolvedValue(articles);
+    articleStore.getArticles().then(response => {
+        articleStore.setArticles(response);
+    }).catch(error => console.error(error));
+
+    beforeEach(() => {
+        articleStore.getArticles().then(response => {
+            articleStore.setArticles(response);
+        }).catch(error => console.error(error));
+    });
+
+    it('fetches articles', () => {
+        let instances = articleStore.articles;
+        expect(typeof instances[0]).toEqual('object');
+        expect(instances[0].caption).toBe("art1");
+        expect(instances[0].writerId).toBe(0);
+        expect(instances[0].id).toBe(0);
+        expect(instances[0].content).toBe("art1");
+        expect(instances[0].imageUrl).toBe("url1");
+        expect(typeof instances[1]).toEqual('object');
+        expect(instances[1].caption).toBe("art2");
+        expect(instances[1].writerId).toBe(1);
+        expect(instances[1].id).toBe(1);
+        expect(instances[1].content).toBe("art2");
+        expect(instances[1].imageUrl).toBe("url2");
+    })
 });
