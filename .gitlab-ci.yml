@@ -23,18 +23,18 @@ run_tests:
     paths:
       - coverage/
 
-# Publish coverage report on gitlab-pages
-pages:
-  stage: deploy
-  dependencies:
-    - run_tests
-  script:
-    - mkdir .public
-    - cp -r server/coverage/* .public
-    - mv .public public
-  artifacts:
-    paths:
-      - public
-  only:
-    - master
+## Publish coverage report on gitlab-pages
+#pages:
+#  stage: deploy
+#  dependencies:
+#    - run_tests
+#  script:
+#    - mkdir .public
+#    - cp -r server/coverage/* .public
+#    - mv .public public
+#  artifacts:
+#    paths:
+#      - public
+#  only:
+#    - master
 
