@@ -112,4 +112,25 @@ app.get("/news/search/:searchText", (req, res) => {
                 .catch(error => console.error(error));
 });
 
+app.get("/news/comments/:id", (req, res) => {
+    console.log("GET-request received from client");
+    return model.CommentModel.findAll({
+        where: {articleId: req.params.id},
+        order: [['createdAt', 'DESC']]
+    })
+                .then(comments => res.send(comments))
+                .catch(error => console.error(error));
+});
+
+app.post("/news/comments", (req, res) => {
+    console.log("POST-request received from client");
+    return model.CommentModel.create({
+        user: req.body.commenter,
+        articleId: req.body.articleId,
+        text: req.body.text
+    })
+                .then(res.sendStatus(201))
+                .catch(error => console.log(error));
+});
+
 var server = app.listen(4000);

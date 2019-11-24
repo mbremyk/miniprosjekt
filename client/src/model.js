@@ -127,18 +127,42 @@ export class User
 
 export class Comment
 {
-    commenter: User;
-    id: number;
-    static nextId: number = 0;
+    commenter: string;
+    articleId: number;
     text: string;
 
-    constructor(commenter: User, text: string)
+    constructor(articleId: number, commenter: string, text: string)
     {
         this.commenter = commenter;
-        this.id = Comment.nextId++;
+        this.articleId = articleId;
         this.text = text;
+    }
+}
+
+export class CommentStore
+{
+    comments: Comment[] = [];
+
+    setComments(props: Comment[])
+    {
+        this.comments = props;
+    }
+
+    getComments(articleId: number)
+    {
+        return axios.get(host + `/news/comments/${articleId}`).then(response => {
+            return response.data;
+        });
+    }
+
+    postComment(comment: Comment)
+    {
+        return axios.post(host + `/news/comments`, comment).then(response => {
+            return response.data;
+        })
     }
 }
 
 export let articleStore = sharedComponentData(new ArticleStore());
 export let categoryStore = sharedComponentData(new CategoryStore());
+export let commentStore = sharedComponentData(new CommentStore());

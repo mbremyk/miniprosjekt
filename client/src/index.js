@@ -28,7 +28,7 @@ import {
 } from '@material-ui/core';
 import {BrowserRouter, NavLink, Route, Switch} from 'react-router-dom';
 import AccountCircle from '@material-ui/icons/AccountCircle';
-import {articleStore, categoryStore, User} from "./model.js";
+import {articleStore, categoryStore, commentStore, User} from "./model.js";
 import AddIcon from "@material-ui/icons/Add";
 import {createMuiTheme, ThemeProvider} from '@material-ui/core/styles';
 import {useStyles} from "./styles.js";
@@ -63,46 +63,86 @@ class Tag extends Component<{ props: { text: string, linkTo: string } }>
     }
 }
 
-function CommentField()
+function CommentField(props)
 {
-    const [values, setValues] = React.useState(currentUser);
+    const [user, setUser] = React.useState("");
+    const [comment, setComment] = React.useState("");
+    const classes = useStyles();
 
-    const handleChange = name => event => {
-        setValues({...values, [name]: event.target.value});
+    const handleSubmit = event => {
+        commentStore.postComment({
+            commenter: user,
+            text: comment,
+            articleId: props.articleId
+        }).then(response => alert(response)).catch(error => console.error(error))
     };
 
     return (
-        <form className='commentField'>
+        <form className='commentField' onSubmit={handleSubmit}>
             <TextField
-                id="outlined-full-width"
+                required
+                id="txtName"
                 label="Label"
                 style={{margin: 8}}
-                placeholder="Placeholder"
-                helperText="Full width!"
+                placeholder="Name"
+                helperText="Your name here"
+                margin="normal"
+                variant="outlined"
+                InputLabelProps={{
+                    shrink: true,
+                }}
+                onChange={e => {
+                    setUser(e.target.value);
+                }}
+            />
+            <TextField
+                required
+                id="txtComment"
+                label="Comment"
+                style={{margin: 8}}
+                placeholder="Comment"
+                helperText="Comment here"
                 fullWidth
                 margin="normal"
                 variant="outlined"
                 InputLabelProps={{
                     shrink: true,
                 }}
+                onChange={e => {
+                    setComment(e.target.value);
+                }}
             />
+            <Button type="submit" label="submit" className={classes.submitButton}>Submit</Button>
         </form>
     );
 }
 
-function CommentList()
+function CommentList(props)
 {
+    const comments = props.comments;
+    const classes = useStyles();
+    const [isLoading, setIsLoading] = React.useState(true);
+
+    React.useEffect(() => {
+        commentStore.getComments(props.articleId).then(response => {
+            commentStore.setComments(response);
+            setIsLoading(false);
+        }).catch(error => console.error(error));
+    }, [isLoading]);
+
     return (
         <div>
             <ul>
-                {comments.map(comment => (
+                {isLoading && <Card className={classes.loadingCard}><CardContent><Typography
+                    varian="h5">Loading...</Typography></CardContent></Card>}
+                {!isLoading && commentStore.comments.map(comment => (
                     <div>
-                        <a href={comment.commenter.link}><h4>{comment.commenter.name}</h4></a>
+                        <h4>{comment.commenter}</h4>
                         <div>{comment.text}</div>
                     </div>
                 ))}
             </ul>
-            <CommentField/>
+            <CommentField articleId={props.articleId}/>
         </div>
     );
 }
@@ -113,7 +153,6 @@ export function TabList(props)
     const classes = useStyles();
 
     const handleChange = (event, newValue) => {
-        setIsLoading(true);
         articleStore.getArticlesByCategory(newValue).then(response => {
             props.setValue(newValue);
             articleStore.setArticles(response);
@@ -124,7 +163,6 @@ export function TabList(props)
     };
 
     React.useEffect(() => {
-        setIsLoading(true);
         categoryStore.getCategories().then(response => {
             categoryStore.setCategories(response);
             setIsLoading(false);
@@ -369,6 +407,7 @@ function ArticleView(props)
                         {authorized &&
                         <Button to={`/edit/${article.id}`} component={NavLink}
                                 className={classes.submitButton}>Edit</Button>}
+                        <CommentList articleId={article.id}/>
                     </div>
                 );
             })}
@@ -498,7 +537,6 @@ function NewArticleView()
                             value={category}
                             onChange={e => {
                                 setCategory(e.target.value);
-                                console.log(e.target.value)
                             }}
                             labelWidth={labelWidth}
                         >

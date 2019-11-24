@@ -51,7 +51,21 @@ let CategoryModel: Class<Sequelize.Model<Category>> = sequelize.define('category
     tableName: 'category'
 });
 
+export type Comment = {
+    articleId: number,
+    user: string,
+    text: string
+}
+
+let CommentModel: Class<Sequelize.Model<Comment>> = sequelize.define('comment', {
+    articleId: {type: Sequelize.INTEGER, primaryKey: true},
+    user: {type: Sequelize.STRING, primaryKey: true},
+    text: Sequelize.STRING
+}, {
+    tableName: 'comment'
+});
+
 let production = process.env.NODE_ENV === 'production';
 console.log(process.env.NODE_ENV);
 
-module.exports = {ArticleModel, CategoryModel};
+module.exports = {ArticleModel, CategoryModel, CommentModel};
