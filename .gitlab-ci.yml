@@ -18,6 +18,7 @@ run_tests:
   stage: test
   script:
     - cd client && npm install && npm test
+    - cd ../server && npm install && npm test
   artifacts:
     paths:
       - coverage/

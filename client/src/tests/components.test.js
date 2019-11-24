@@ -2,9 +2,10 @@ import * as React from 'react';
 import {shallow} from "enzyme";
 import {TabList} from "../index.js";
 import {categoryStore} from "../model.js";
-import {Tabs} from "@material-ui/core";
+import {Card, CardActionArea, CardActions, Tabs} from "@material-ui/core";
 import {articleStore} from "../model";
 import type {Article} from "../../../server/model";
+import {ArticleCard} from "../index";
 
 describe('TabList tests', () => {
     let tabs = [{categoryId: 0, categoryName: "cat1"}, {categoryId: 1, categoryName: "cat2"}];
@@ -62,6 +63,14 @@ describe("ArticleCard tests", () => {
         articleStore.setArticles(response);
     }).catch(error => console.error(error));
 
+    const wrapper = article => shallow(
+        <ArticleCard
+            required={true}
+            props={article}
+            match={{isExact: true, path: "", url: ""}}
+        />
+    );
+
     beforeEach(() => {
         articleStore.getArticles().then(response => {
             articleStore.setArticles(response);
@@ -82,5 +91,21 @@ describe("ArticleCard tests", () => {
         expect(instances[1].id).toBe(1);
         expect(instances[1].content).toBe("art2");
         expect(instances[1].imageUrl).toBe("url2");
-    })
+    });
+
+    it('renders ArticleCards', () => {
+        let instance = wrapper(articleStore.articles[0]);
+        expect(instance.find(Card).length).toBe(1);
+        instance = wrapper(articleStore.articles[1]);
+        expect(instance.find(Card).length).toBe(1)
+    });
+
+    it('has the appropriate children', () => {
+        let instance = wrapper(articleStore.articles[0]);
+        expect(instance.find(CardActionArea).length).toBe(1);
+        expect(instance.find(CardActions).length).toBe(1);
+        instance = wrapper(articleStore.articles[1]);
+        expect(instance.find(CardActionArea).length).toBe(1);
+        expect(instance.find(CardActions).length).toBe(1);
+    });
 });
